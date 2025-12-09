@@ -1,0 +1,8 @@
+
+> ai-api-tester@1.0.0 dev
+> ts-node-dev --respawn --transpile-only src/server.ts
+
+[INFO] 11:09:11 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+{"timestamp":"2025-12-09T11:09:12.514Z","level":"info","message":"Server listening on port 3000"}
+[INFO] 11:11:12 Restarting: /app/src/server.ts has been modified
+{"timestamp":"2025-12-09T11:11:13.452Z","level":"info","message":"Server listening on port 3000"}

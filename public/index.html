@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI API Tester</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f7f7f7; color: #333; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
+        h1 { color: #111; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        label { font-weight: bold; }
+        input[type="file"], textarea, button { font-size: 16px; padding: 10px; border-radius: 4px; border: 1px solid #ddd; }
+        button { background-color: #007bff; color: #fff; cursor: pointer; border: none; }
+        button:hover { background-color: #0056b3; }
+        #results { margin-top: 20px; }
+        #spinner { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI API Tester</h1>
+        <form id="test-form">
+            <div>
+                <label for="spec">OpenAPI Spec (optional)</label>
+                <input type="file" id="spec" name="spec">
+            </div>
+            <div>
+                <label for="instruction">Test Instruction</label>
+                <textarea id="instruction" name="instruction" rows="4" required></textarea>
+            </div>
+            <button type="submit">Run Test</button>
+        </form>
+        <div id="spinner">Running test...</div>
+        <div id="results"></div>
+    </div>
+    <script>
+        const form = document.getElementById('test-form');
+        const resultsDiv = document.getElementById('results');
+        const spinner = document.getElementById('spinner');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            resultsDiv.innerHTML = '';
+            spinner.style.display = 'block';
+
+            const formData = new FormData(form);
+            let specId = null;
+
+            if (formData.get('spec').size > 0) {
+                const specUploadData = new FormData();
+                specUploadData.append('spec', formData.get('spec'));
+
+                try {
+                    const specRes = await fetch('/upload-spec', {
+                        method: 'POST',
+                        body: specUploadData,
+                    });
+                    if (!specRes.ok) {
+                        throw new Error('Failed to upload spec file.');
+                    }
+                    const specData = await specRes.json();
+                    specId = specData.specId;
+                } catch (error) {
+                    resultsDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+                    spinner.style.display = 'none';
+                    return;
+                }
+            }
+
+            try {
+                const testRes = await fetch('/run-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        instruction: formData.get('instruction'),
+                        specId: specId,
+                    }),
+                });
+
+                if (!testRes.ok) {
+                    throw new Error('Failed to run test.');
+                }
+
+                const testData = await testRes.json();
+                const reportName = testData.reportPath.split('/').pop();
+
+                resultsDiv.innerHTML = `
+                    <h2>Test Complete</h2>
+                    <p><strong>Status:</strong> ${testData.report.summary.status}</p>
+                    <p><a href="/report/${reportName}" target="_blank">View Full Report</a></p>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            } finally {
+                spinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
