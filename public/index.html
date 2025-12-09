@@ -4,17 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI API Tester</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f7f7f7; color: #333; }
-        .container { max-width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
-        h1 { color: #111; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; }
-        input[type="file"], textarea, button { font-size: 16px; padding: 10px; border-radius: 4px; border: 1px solid #ddd; }
-        button { background-color: #007bff; color: #fff; cursor: pointer; border: none; }
-        button:hover { background-color: #0056b3; }
-        #results { margin-top: 20px; }
-        #spinner { display: none; }
+        :root {
+            --primary-color: #00aaff;
+            --background-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-background: #2a2a2a;
+            --border-color: #444;
+            --spinner-color: var(--primary-color);
+        }
+        body {
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        label {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        input[type="file"], textarea, button {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #333;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        input[type="file"]::-webkit-file-upload-button {
+            background: var(--primary-color);
+            color: var(--background-color);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        textarea:focus, button:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #0077b3;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+        #spinner {
+            display: none;
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #555;
+            border-top: 5px solid var(--spinner-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #results {
+            margin-top: 30px;
+            text-align: center;
+        }
+        #results a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -27,11 +119,11 @@
             </div>
             <div>
                 <label for="instruction">Test Instruction</label>
-                <textarea id="instruction" name="instruction" rows="4" required></textarea>
+                <textarea id="instruction" name="instruction" rows="5" required></textarea>
             </div>
             <button type="submit">Run Test</button>
         </form>
-        <div id="spinner">Running test...</div>
+        <div id="spinner"></div>
         <div id="results"></div>
     </div>
     <script>
